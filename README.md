@@ -38,7 +38,7 @@ Getting Started
 To get started with MedAI, you can clone the repository and run the Jupyter notebooks that guide you through the process of data exploration, feature engineering, model development, and deployment.
 
 
-git clone 
+git clone https://github.com/HemVora06/MedAI-Unveiling-Insights-in-Healthcare-Data.git
 cd MedAI
 jupyter notebook
 
