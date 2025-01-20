@@ -158,4 +158,29 @@ plt.show()
 grouped_data = cancer_data.groupby('diagnosis', observed=True)['radius_mean'].mean()
 plt.figure(figsize=(10, 6))
 sns.barplot(x=grouped_data.index, y=grouped_data.values)
+plt.title('Average Grouped Radius Mean')
+plt.show()
+
+#Exploring the distribution of `texture_mean` using a KDE plot.
+plt.figure(figsize=(10, 6))
+sns.kdeplot(cancer_data['texture_mean'], shade=True)
+plt.title('KDE Plot of Texture Mean')
+plt.show()
+
+#Plotting Diagnosis column in a Bar Plot
+plt.figure(figsize=(10, 6))
+sns.countplot(x='diagnosis', data=cancer_data)
+plt.title('Bar Plot of Diagnosis')
+plt.show()
+
+#Creating a Pair plot of 'Radius Mean', 'Texture Mean' and 'Area Mean' with the hue of 'Diagnosis'
+plt.figure(figsize=(10, 6))
+sns.pairplot(data=cancer_data, vars=['radius_mean', 'texture_mean', 'area_mean'], hue='diagnosis')
+plt.show()
+
+#Grouping data by Diagnosis and plotting average 'Compactness Mean' in a Bar Plot
+grouped_data = cancer_data.groupby('diagnosis', observed=True)['compactness_mean'].mean()
+plt.figure(figsize=(10, 6))
+sns.barplot(x=grouped_data.index, y=grouped_data.values)
+plt.title('Average Grouped Compactness Mean')
 plt.show()
