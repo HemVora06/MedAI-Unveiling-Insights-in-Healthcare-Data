@@ -110,20 +110,52 @@ plt.show()
 #Plotting Histograms for Radius Mean
 
 plt.figure(figsize=(10, 6))
-sns.histplot(cancer_data['radius_mean'], hue=cancer_data['diagnosis'], kde=True)
+sns.histplot(cancer_data['radius_mean'], kde=True)
 plt.title('Histogram of Radius Mean')
 plt.show()
 
 #Plotting Histograms for Texture Mean
 
 plt.figure(figsize=(10, 6))
-sns.histplot(cancer_data['texture_mean'], hue=cancer_data['diagnosis'], kde=True)
+sns.histplot(cancer_data['texture_mean'], kde=True)
 plt.title('Histogram of Texture Mean')
 plt.show()
 
 #Plotting Histogram for Area Mean
 plt.figure(figsize=(10, 6))
-sns.histplot(cancer_data['area_mean'], hue=cancer_data['diagnosis'], kde=True)
+sns.histplot(cancer_data['area_mean'], kde=True)
 plt.title('Histogram of Area Mean')
 plt.show()
 
+#Visualizing the Relationship between 'Radius Mean' and 'Area Mean' based on the Diagnosis on a Scatter Pot
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='radius_mean', y='area_mean', data=cancer_data, hue='diagnosis')
+plt.title('Scatter Plot of Radius Mean vs Area Mean based on Diagnosis')
+plt.show()
+
+#Grouping data by the "diagnosis" column and computing the mean for all other features.
+grouped_data = cancer_data.groupby('diagnosis', observed=True).mean()
+print(grouped_data)
+
+#Using a box plot to compare `perimeter_mean` between benign and malignant cases.
+plt.figure(figsize=(10, 6))
+sns.boxplot(x='diagnosis', y='perimeter_mean', data=cancer_data)
+plt.title('Box Plot of Perimeter Mean based on Diagnosis')
+plt.xlabel('0-Benign, 1-Malignant', fontsize=16)
+plt.show()
+
+#Calculating the Mode of the Diagnosis
+normal_diagnosis=cancer_data['diagnosis'].astype('int')
+print('Mode of Diagnosis(0-Benign, 1-Malignant): ', normal_diagnosis.mode()[0])
+
+#Creating a violin plot to show the distribution of `radius_mean` for each `diagnosis` type
+plt.figure(figsize=(10, 6))
+sns.violinplot(x='diagnosis', y='radius_mean', data=cancer_data)
+plt.title('Violin Plot of Radius Mean based on Diagnosis')
+plt.show()
+
+#Grouping data by Diagnosis and plotting average 'Radius Mean' in a Bar Plot
+grouped_data = cancer_data.groupby('diagnosis', observed=True)['radius_mean'].mean()
+plt.figure(figsize=(10, 6))
+sns.barplot(x=grouped_data.index, y=grouped_data.values)
+plt.show()
