@@ -105,3 +105,25 @@ corr_matrix = numeric_val.corr()
 sns.heatmap(corr_matrix, annot=True, cmap='coolwarm')
 plt.show()
 
+#Exploratory Data Analysis and Basic Data Exploration
+
+#Plotting Histograms for Radius Mean
+
+plt.figure(figsize=(10, 6))
+sns.histplot(cancer_data['radius_mean'], hue=cancer_data['diagnosis'], kde=True)
+plt.title('Histogram of Radius Mean')
+plt.show()
+
+#Plotting Histograms for Texture Mean
+
+plt.figure(figsize=(10, 6))
+sns.histplot(cancer_data['texture_mean'], hue=cancer_data['diagnosis'], kde=True)
+plt.title('Histogram of Texture Mean')
+plt.show()
+
+#Plotting Histogram for Area Mean
+plt.figure(figsize=(10, 6))
+sns.histplot(cancer_data['area_mean'], hue=cancer_data['diagnosis'], kde=True)
+plt.title('Histogram of Area Mean')
+plt.show()
+
