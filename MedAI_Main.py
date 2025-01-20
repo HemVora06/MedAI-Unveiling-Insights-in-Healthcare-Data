@@ -184,3 +184,52 @@ plt.figure(figsize=(10, 6))
 sns.barplot(x=grouped_data.index, y=grouped_data.values)
 plt.title('Average Grouped Compactness Mean')
 plt.show()
+
+#Identify outliers in `radius_mean` using Interquartile Range (IQR) analysis.
+
+def find_outliers(data, feature):
+    Q1 = data[feature].quantile(0.25)
+    Q3 = data[feature].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    outliers = data[(data[feature] < lower_bound) | (data[feature] > upper_bound)][feature]
+    return outliers
+
+print(find_outliers(cancer_data, 'radius_mean'))
+
+#Creating a pivot table to show the average `area_mean` and `perimeter_mean` for each `diagnosis`
+pivot_table = pd.pivot_table(cancer_data, values=['area_mean', 'perimeter_mean'], index='diagnosis', aggfunc='mean')
+print(pivot_table)
+
+#Creating a violin plot to show the distribution of `smoothness_mean` for each `diagnosis` type
+plt.figure(figsize=(10, 6))
+sns.violinplot(x='diagnosis', y='smoothness_mean', data=cancer_data)
+plt.title('Violin Plot of Smoothness Mean based on Diagnosis')
+plt.show()
+
+#Visualizing the Relationship between 'Radius Mean' and 'Texture Mean' based on the Diagnosis on a Scatter Pot
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='radius_mean', y='texture_mean', data=cancer_data, hue='diagnosis')
+plt.title('Scatter Plot of Radius Mean vs Texture Mean based on Diagnosis')
+plt.show()
+
+# Group by `diagnosis` and visualize the average value of top 5 features with highest correlation to the target
+corr_matrix=cancer_data.corr()['diagnosis'].drop(['diagnosis', 'id'])
+top_5_features=corr_matrix.abs().sort_values(ascending=False).head(5).index
+grouped_data=cancer_data.groupby('diagnosis', observed=True)[top_5_features].mean()
+grouped_data.T.plot(kind='bar', figsize=(10, 6), color=['skyblue', 'orange'])
+plt.title('Average Values of Top 5 Features Grouped by Diagnosis')
+plt.ylabel('Average Value')
+plt.xlabel('Features')
+plt.xticks(rotation=45)
+plt.legend(title='Diagnosis', labels=['Benign', 'Malignant'])
+plt.tight_layout()
+plt.show()
+
+#Generating a bar chart that shows the frequency of the target variable for each unique value in a specific feature (e.g., `radius_mean` binned).
+cancer_data['radius_mean_bin']=pd.cut(x=cancer_data['radius_mean'], bins=[10, 15, 20, 25, 30])
+cross_tab=pd.crosstab(cancer_data['radius_mean_bin'], cancer_data['diagnosis'])
+plt.figure(figsize=(10, 6))
+cross_tab.plot(kind='bar', stacked=True)
+plt.show()
