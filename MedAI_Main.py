@@ -264,4 +264,23 @@ class MinMaxScaler():
 
 scaler2 = MinMaxScaler(feature_range=(0, 1))
 cancer_data[['normalized_radius_mean', 'normalzed_perimeter_mean', 'normalized_area_mean']] = scaler2.fit_transform(cancer_data, ['radius_mean', 'perimeter_mean', 'area_mean'])
-print(cancer_data[['normalized_radius_mean', 'normalzed_perimeter_mean', 'normalized_area_mean']])
+print(cancer_data[['normalized_radius_mean', 'normalzed_perimeter_mean', 'normalized_area_mean']].head())
+
+
+class PCA():
+    def __init__(self, n_components, data):
+        self.n_components = n_components
+        self.data = data
+        self.standardized_data = None
+    
+    def standardize_data(self, data, features = None):
+        if features == None:
+            features = data.columns
+            self.standardized_data = (data[features] - data[features].mean()) / data[features].std()
+        else:
+            self.standardized_data = (data[features] - data[features].mean()) / data[features].std()
+        return self.standardized_data
+    def compute_covariance(self, data, features=None):
+        if features == None:
+            features = data.columns
+            
