@@ -217,3 +217,51 @@ cancer_data['radius_mean_bin']=pd.cut(x=cancer_data['radius_mean'], bins=[10, 15
 cross_tab=pd.crosstab(cancer_data['radius_mean_bin'], cancer_data['diagnosis'])
 plt.figure(figsize=(10, 6))
 cross_tab.plot(kind='bar', stacked=True)
+
+#Data Cleaning and Data Preprocessing
+
+#Creating a Standard Scaler to Standardize Columns
+class StandardScaler():
+    def __init__(self):
+        self._mean = None
+        self._std_dev = None
+        self._standardized = None
+
+    def fit(self, data, features):
+        self._mean = data[features].mean()
+        self._std_dev = data[features].std()
+        return self._mean, self._std_dev
+
+    def transform(self, data, features):
+        self._standardized = (data[features] - self._mean) / self._std_dev
+        return self._standardized
+    
+    def fit_transform(self, data, features):
+        self.fit(data, features)
+        return self.transform(data, features)
+
+scaler = StandardScaler()
+cancer_data[['standardized_radius_mean', 'standardized_perimeter_mean', 'standardized_area_mean']] = scaler.fit_transform(cancer_data, ['radius_mean', 'perimeter_mean', 'area_mean'])
+print(cancer_data[['standardized_radius_mean', 'standardized_perimeter_mean', 'standardized_area_mean']].head())
+
+#Creating a MinMax Scaler to Normalize data
+class MinMaxScaler():
+    def __init__(self, feature_range):
+        self.feature_range = feature_range
+        self._min = None
+        self._max = None
+    def fit(self, data, features):
+        self._min = data[features].min()
+        self._max = data[features].max()
+        return self._min, self._max
+    def transform(self, data, features):
+        scaled = (data[features] - self._min) / (self._max - self._min)
+        normalized = scaled * (self.feature_range[0] + self.feature_range[1]) + self.feature_range[0]
+        return normalized
+    def fit_transform(self, data, features):
+        self.fit(data, features)
+        return self.transform(data, features)
+
+scaler2 = MinMaxScaler(feature_range=(0, 1))
+cancer_data[['normalized_radius_mean', 'normalzed_perimeter_mean', 'normalized_area_mean']] = scaler2.fit_transform(cancer_data, ['radius_mean', 'perimeter_mean', 'area_mean'])
+print(cancer_data[['normalized_radius_mean', 'normalzed_perimeter_mean', 'normalized_area_mean']])
