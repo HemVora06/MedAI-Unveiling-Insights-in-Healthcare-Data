@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy.stats as stats
 import seaborn as sns
 
 #Importing the dataset
@@ -279,7 +280,7 @@ class PCA():
         self._explained_variance_ratio = None
         self._cumuative_explained_variance = None
         self._selected_components = None
-        self._transformed_data = None
+        self.transformed_data = None
 
     def standardizing_data(self, data, features = None):
         if features == None:
@@ -309,8 +310,8 @@ class PCA():
         if features == None:
             features = data.select_dtypes(include=[np.number]).columns        
         centered_data = data[features] - data[features].mean()
-        self._transformed_data = centered_data.dot(self._selected_components)
-        return self._transformed_data
+        self.transformed_data = centered_data.dot(self._selected_components)
+        return self.transformed_data
     def fit_transform(self, data, features = None):
         if features == None:
             features = data.columns
@@ -323,3 +324,13 @@ class PCA():
 
 principal_component_analysis = PCA(n_components = 3, data = cancer_data)
 print(principal_component_analysis.fit_transform(cancer_data))
+
+#Dropping any redundant variables
+cancer_data.drop(['id'], axis = 1, inplace = True)
+
+#Checking for outliers in 'Area Mean' using z scores
+cancer_data['area_mean_zscore'] = stats.zscore(cancer_data['area_mean'])
+
+print(cancer_data.loc[cancer_data['area_mean_zscore'] >= 3, 'diagnosis'])
+
+
