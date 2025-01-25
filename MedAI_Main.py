@@ -276,7 +276,7 @@ class PCA():
         self._corv_matrix = None
         self._eigenvector = None
         self._eigenvalue = None
-        self._total_variance = None
+        self.total_variance = None
         self._explained_variance_ratio = None
         self._cumuative_explained_variance = None
         self._selected_components = None
@@ -301,8 +301,8 @@ class PCA():
         self._eigenvector = self._eigenvector[:, sorted_indices]
         return self._eigenvalue, self._eigenvector
     def select_components(self):
-        self._total_variance = sum(self._eigenvalue)
-        self._explained_variance_ratio = self._eigenvalue / self._total_variance
+        self.total_variance = sum(self._eigenvalue)
+        self._explained_variance_ratio = self._eigenvalue / self.total_variance
         self._cumuative_explained_variance = np.cumsum(self._explained_variance_ratio)
         self._selected_components = self._eigenvector[:, : self.n_components]
         return self._selected_components
@@ -331,6 +331,33 @@ cancer_data.drop(['id'], axis = 1, inplace = True)
 #Checking for outliers in 'Area Mean' using z scores
 cancer_data['area_mean_zscore'] = stats.zscore(cancer_data['area_mean'])
 
-print(cancer_data.loc[cancer_data['area_mean_zscore'] >= 3, 'diagnosis'])
+print(cancer_data.loc[cancer_data['area_mean_zscore'] >= 2, 'area_mean'])
 
+#Capping the outliers
+threshold = 2
+max_valid_value = cancer_data.loc[cancer_data['area_mean_zscore'].abs() <= threshold, 'area_mean'].max()
+cancer_data['area_mean'] = np.where(cancer_data['area_mean_zscore'] > threshold, max_valid_value, cancer_data['area_mean'])
 
+print(cancer_data.loc[cancer_data['area_mean_zscore'] >= 2, 'area_mean'])
+
+cancer_data.drop(['area_mean_zscore'], axis = 1, inplace = True)
+
+#Calculating Skewness and Kurtois of Numerical Data
+skewness = numeric_val.skew()
+kurtosis = numeric_val.kurtosis()
+print('Skewness: \n', skewness, '\n Kurtois: \n', kurtosis)
+
+#Transforming Data that is highly skewed using Log Transformation
+for features, skew_value in skewness.items():
+    if skew_value >= 1:
+        transformed = np.log1p(numeric_val[features])
+        new_skew = stats.skew(transformed)
+        print(f"Transformed Skewness for {features}: {new_skew}")
+        cancer_data[features] = transformed
+
+#Finding the features with non zero Variance and are insignificant
+variance = numeric_val.var()
+insignificant_features = variance[variance <= 1].index
+print(insignificant_features)
+numeric_val.drop(insignificant_features, axis = 1, inplace = True)
+print(numeric_val)
