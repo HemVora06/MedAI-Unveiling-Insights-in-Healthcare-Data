@@ -35,7 +35,7 @@ cancer_data['diagnosis'] = cancer_data['diagnosis'].map(diagnosis_map)
 #Target, Features and Numeric Values for Machine Learning
 target = cancer_data['diagnosis']
 features = cancer_data[['radius_mean', 'texture_mean', 'perimeter_mean', 'area_mean', 'smoothness_mean', 'compactness_mean', 'concavity_mean', 'concave points_mean', 'symmetry_mean', 'fractal_dimension_mean']]
-numeric_val=cancer_data.drop(columns=['diagnosis', 'id'], axis=1)
+numeric_features=cancer_data.drop(columns=['diagnosis', 'id'], axis=1)
 
 #Converting Categorical Features into category DType
 cancer_data['diagnosis']=cancer_data['diagnosis'].astype('category')
@@ -75,7 +75,7 @@ print(cancer_data_std_dev)
 
 #Investigating correlations between numerical features and the target variable
 #Correlation is a measure of the relationship between two variables
-corr_matrix = numeric_val.corrwith(target)
+corr_matrix = numeric_features.corrwith(target)
 print('Correlation Matrix: \n', corr_matrix)
 '''According to the corrlation matrix, these are the features that are either strongly or moderately positively related to target along with their values:
 radius_mean                0.730029
@@ -103,7 +103,7 @@ features=[cancer_data[['radius_mean', 'perimeter_mean', 'area_mean', 'compactnes
 'area_worst', 'compactness_worst', 'concavity_worst', 'concave points_worst']]]
 
 #Creating a heatmap of correlations among all numerical features
-corr_matrix = numeric_val.corr()
+corr_matrix = numeric_features.corr()
 sns.heatmap(corr_matrix, annot=True, cmap='coolwarm')
 
 #Exploratory Data Analysis and Basic Data Exploration
@@ -254,21 +254,26 @@ print(cancer_data.loc[cancer_data['area_mean_zscore'] >= 2, 'area_mean'])
 cancer_data.drop(['area_mean_zscore'], axis = 1, inplace = True)
 
 #Calculating Skewness and Kurtois of Numerical Data
-skewness = numeric_val.skew()
-kurtosis = numeric_val.kurtosis()
+skewness = numeric_features.skew()
+kurtosis = numeric_features.kurtosis()
 print('Skewness: \n', skewness, '\n Kurtois: \n', kurtosis)
 
 #Transforming Data that is highly skewed using Log Transformation
 for features, skew_value in skewness.items():
     if skew_value >= 1:
-        transformed = np.log1p(numeric_val[features])
+        transformed = np.log1p(numeric_features[features])
         new_skew = stats.skew(transformed)
         print(f"Transformed Skewness for {features}: {new_skew}")
         cancer_data[features] = transformed
 
 #Finding the features with Variance less than 1 and are insignificant
-variance = numeric_val.var()
+variance = numeric_features.var()
 insignificant_features = variance[variance <= 1].index
 print(insignificant_features)
-numeric_val.drop(insignificant_features, axis = 1, inplace = True)
-print(numeric_val)
+numeric_features.drop(insignificant_features, axis = 1, inplace = True)
+print(numeric_features)
+
+#Splitting the data 80-20
+splitter = func.train_test_split(test_size = 0.2, train_size = 0.8, shuffle = True, random_state = 42)
+X_train, X_test, y_train, y_test = splitter.split(numeric_features, target)
+print(X_train, X_test, y_train, y_test)
