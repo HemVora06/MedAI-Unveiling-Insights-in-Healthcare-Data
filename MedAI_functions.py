@@ -125,7 +125,7 @@ class train_test_split():
     def split(self, data, target):
         self.data_validater(data, target)
         self._n_samples = len(data)
-        self.indices = np.arrange(self._n_samples)
+        self.indices = np.arange(self._n_samples)
         if self.random_state is not None:
             np.random.seed(self.random_state)
         if type(self.test_size) is float and self.train_size == None:
@@ -170,4 +170,4 @@ class train_test_split():
         self.y_train = target.iloc[self.train_indices]
         self.X_test = data.iloc[self.test_indices]
         self.y_test = target.iloc[self.test_indices]
-        return self.X_train, self.y_train, self.X_test, self.y_test
+        return self.X_train, self.X_test, self.y_train, self.y_test
