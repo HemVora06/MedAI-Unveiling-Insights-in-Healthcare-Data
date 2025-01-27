@@ -272,3 +272,33 @@ insignificant_features = variance[variance <= 1].index
 print(insignificant_features)
 numeric_features.drop(insignificant_features, axis = 1, inplace = True)
 print(numeric_features)
+
+#Feature Engineering
+#This point forward, cancer_data would be the testing dataframe and numeric_features, the fitting dataframe
+
+#Creating an Interaction Term between area mean and texture mean.
+#This will allow use to see if area and texture interact with each other and influence the Diagnosis
+cancer_data['area_texture_interaction'] = cancer_data['area_mean'] * cancer_data['texture_mean']
+
+#Bining radius mean into small and large(0 and 1 respectively) based on Quantile Based Approach
+q1 = cancer_data['normalized_area_mean'].quantile(0.50)
+cancer_data['tumor_size'] = cancer_data['normalized_area_mean'].apply(lambda x: 0 if x <= q1 else 1)
+print(cancer_data['tumor_size'].head(30))
+cancer_data['tumor_size'] = cancer_data['tumor_size'].astype('category')
+
+#Generating interaction feature between `smoothness_mean` and `compactness_mean`
+#Interpretation: See if Smoothness and Compactness have any relation
+cancer_data['smoothness_compactness_interaction'] = cancer_data['smoothness_mean'] * cancer_data['compactness_mean']
+
+#Bining the `texture_mean` feature into quantile-based categories
+cancer_data['normalized_texture_mean'] = scaler2.fit_transform(cancer_data, 'texture_mean')
+q1 = cancer_data['normalized_texture_mean'].quantile(0.25)
+q3 = cancer_data['normalized_texture_mean'].quantile(0.75)
+cancer_data['tumor_texture'] = cancer_data['normalized_texture_mean'].apply(lambda x:0 if x <= q1 else 3 if x >= q3 else 2)
+print(cancer_data['tumor_texture'])
+cancer_data['tumor_texture'] = cancer_data['tumor_texture'].astype('category')
+
+#Calculating the average value of features in each row and using it as a new feature
+features = cancer_data.select_dtypes(include = [np.number])
+cancer_data['average_value'] = features.mean(axis = 1)
+print(cancer_data['average_value'].head(20))
