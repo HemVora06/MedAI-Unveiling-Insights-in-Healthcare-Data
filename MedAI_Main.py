@@ -283,7 +283,7 @@ cancer_data['area_texture_interaction'] = cancer_data['area_mean'] * cancer_data
 #Bining radius mean into small and large(0 and 1 respectively) based on Quantile Based Approach
 q1 = cancer_data['normalized_area_mean'].quantile(0.50)
 cancer_data['tumor_size'] = cancer_data['normalized_area_mean'].apply(lambda x: 0 if x <= q1 else 1)
-print(cancer_data['tumor_size'].head(30))
+print(cancer_data['tumor_size'].head(20))
 cancer_data['tumor_size'] = cancer_data['tumor_size'].astype('category')
 
 #Generating interaction feature between `smoothness_mean` and `compactness_mean`
@@ -295,10 +295,28 @@ cancer_data['normalized_texture_mean'] = scaler2.fit_transform(cancer_data, 'tex
 q1 = cancer_data['normalized_texture_mean'].quantile(0.25)
 q3 = cancer_data['normalized_texture_mean'].quantile(0.75)
 cancer_data['tumor_texture'] = cancer_data['normalized_texture_mean'].apply(lambda x:0 if x <= q1 else 3 if x >= q3 else 2)
-print(cancer_data['tumor_texture'])
+print(cancer_data['tumor_texture'].head(20))
 cancer_data['tumor_texture'] = cancer_data['tumor_texture'].astype('category')
 
 #Calculating the average value of features in each row and using it as a new feature
 features = cancer_data.select_dtypes(include = [np.number])
 cancer_data['average_value'] = features.mean(axis = 1)
 print(cancer_data['average_value'].head(20))
+
+#Creating a feature representing the logarithmic transformation of `area_mean`
+cancer_data['log_area_mean'] = np.log1p(cancer_data['area_mean'])
+
+#Adding a feature indicating the difference between `radius_mean` and `radius_worst`
+cancer_data['radius_difference'] = cancer_data['radius_mean'] - cancer_data['radius_worst']
+
+#Engineering a feature based on domain knowledge, such as a “risk score” combining key predictors
+#Thsse key predictors are texture mean, compactness mean, symmetery mean, and concavity mean
+#Weights are Arbritrary
+cancer_data['risk_score'] = (
+    cancer_data['texture_mean'] * 0.3 +
+    cancer_data['concavity_mean'] * 0.2 +
+    cancer_data['symmetry_mean'] * 0.25 +
+    cancer_data['radius_mean'] * 0.15 +
+    cancer_data['compactness_mean'] * 0.1
+)
+print(cancer_data['risk_score'])
