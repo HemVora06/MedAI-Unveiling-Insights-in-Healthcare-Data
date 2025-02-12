@@ -207,4 +207,18 @@ cross_tab=pd.crosstab(cancer_data['radius_mean_bin'], cancer_data['diagnosis'])
 plt.figure(figsize=(10, 6))
 cross_tab.plot(kind='bar', stacked=True)
 
+#Comparing My PCA with Scikit Learn's
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+scaler_sklearn = StandardScaler()
+pca_sklearn = PCA(n_components = 2)
+scaled_cancer_data = scaler_sklearn.fit_transform(cancer_data.select_dtypes(include = [np.number]))
+X_pca_sklearn = pca_sklearn.fit_transform(scaled_cancer_data)
+
+pca_scratch = func.PCA(n_components = 2, data = cancer_data)
+X_pca_scratch = pca_scratch.fit_transform(cancer_data)
+
+print("Scikit Learn's Explained Variance Ratio: ", pca_sklearn.explained_variance_ratio_)
+print("Scratch's Explained Variance Ratio: ", pca_scratch.explained_variance_ratio)
+
 #Data Cleaning and Data Preprocessing
