@@ -51,7 +51,8 @@ class PCA():
         self.total_variance = None
         self.explained_variance_ratio = None
         self.cumuative_explained_variance = None
-        self._selected_components = None
+        self.selected_components = None
+        self.components_ = None
         self.transformed_data = None
 
     def standardizing_data(self, features = None):
@@ -73,17 +74,18 @@ class PCA():
         self.eigenvector = self.eigenvector[:, sorted_indices]
         return self.eigenvalue, self.eigenvector
     def select_components(self):
+        self.components_ = self.eigenvector
         self.total_variance = sum(self.eigenvalue)        
         selected_eigenvalues = self.eigenvalue[:self.n_components]
         self.explained_variance_ratio = selected_eigenvalues / self.total_variance
         self.cumuative_explained_variance = np.cumsum(self.explained_variance_ratio)
-        self._selected_components = self.eigenvector[:, : self.n_components]
-        return self._selected_components
+        self.selected_components = self.eigenvector[:, : self.n_components]
+        return self.selected_components
     def transform(self, features = None):
         if features is None:
             features = self.data.select_dtypes(include=[np.number]).columns        
         centered_data = self.data[features] - self.data[features].mean()
-        self.transformed_data = centered_data.dot(self._selected_components)
+        self.transformed_data = centered_data.dot(self.selected_components)
         return self.transformed_data
     def fit_transform(self, features = None):
         if features is None:
