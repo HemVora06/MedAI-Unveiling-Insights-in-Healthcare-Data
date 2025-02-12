@@ -73,8 +73,9 @@ class PCA():
         self.eigenvector = self.eigenvector[:, sorted_indices]
         return self.eigenvalue, self.eigenvector
     def select_components(self):
-        self.total_variance = sum(self.eigenvalue)
-        self.explained_variance_ratio = self.eigenvalue / self.total_variance
+        self.total_variance = sum(self.eigenvalue)        
+        selected_eigenvalues = self.eigenvalue[:self.n_components]
+        self.explained_variance_ratio = selected_eigenvalues / self.total_variance
         self.cumuative_explained_variance = np.cumsum(self.explained_variance_ratio)
         self._selected_components = self.eigenvector[:, : self.n_components]
         return self._selected_components
