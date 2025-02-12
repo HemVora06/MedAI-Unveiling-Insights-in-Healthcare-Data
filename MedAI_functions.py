@@ -55,7 +55,7 @@ class PCA():
         self.transformed_data = None
 
     def standardizing_data(self, features = None):
-        if features == None:
+        if features is None:
             features = self.data.select_dtypes(include=[np.number]).columns
             self.standardized_data = (self.data[features] - self.data[features].mean()) / self.data[features].std()
         else:
@@ -79,13 +79,13 @@ class PCA():
         self._selected_components = self.eigenvector[:, : self.n_components]
         return self._selected_components
     def transform(self, features = None):
-        if features == None:
+        if features is None:
             features = self.data.select_dtypes(include=[np.number]).columns        
         centered_data = self.data[features] - self.data[features].mean()
         self.transformed_data = centered_data.dot(self._selected_components)
         return self.transformed_data
     def fit_transform(self, features = None):
-        if features == None:
+        if features is None:
             features = self.data.columns
         self.standardizing_data(features = None)
         self.compute_covariance()
