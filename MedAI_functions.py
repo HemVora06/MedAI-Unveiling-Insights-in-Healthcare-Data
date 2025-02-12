@@ -45,54 +45,54 @@ class PCA():
         self.n_components = n_components
         self.data = data
         self.standardized_data = None
-        self._corv_matrix = None
-        self._eigenvector = None
-        self._eigenvalue = None
+        self.corv_matrix = None
+        self.eigenvector = None
+        self.eigenvalue = None
         self.total_variance = None
-        self._explained_variance_ratio = None
-        self._cumuative_explained_variance = None
+        self.explained_variance_ratio = None
+        self.cumuative_explained_variance = None
         self._selected_components = None
         self.transformed_data = None
 
-    def standardizing_data(self, data, features = None):
+    def standardizing_data(self, features = None):
         if features == None:
-            features = data.select_dtypes(include=[np.number]).columns
-            self.standardized_data = (data[features] - data[features].mean()) / data[features].std()
+            features = self.data.select_dtypes(include=[np.number]).columns
+            self.standardized_data = (self.data[features] - self.data[features].mean()) / self.data[features].std()
         else:
-            self.standardized_data = (data[features] - data[features].mean()) / data[features].std()
+            self.standardized_data = (self.data[features] - self.data[features].mean()) / self.data[features].std()
         return self.standardized_data
     def compute_covariance(self):
-        self._corv_matrix = np.cov(self.standardized_data, rowvar = False)
-        return self._corv_matrix
+        self.corv_matrix = np.cov(self.standardized_data, rowvar = False)
+        return self.corv_matrix
     def compute_eigen(self):
-        self._eigenvalue, self._eigenvector = np.linalg.eig(self._corv_matrix)
-        return self._eigenvalue, self._eigenvector
+        self.eigenvalue, self.eigenvector = np.linalg.eig(self.corv_matrix)
+        return self.eigenvalue, self.eigenvector
     def sort_eigen(self):
-        sorted_indices = np.argsort(self._eigenvalue)[::-1]
-        self._eigenvalue = self._eigenvalue[sorted_indices]
-        self._eigenvector = self._eigenvector[:, sorted_indices]
-        return self._eigenvalue, self._eigenvector
+        sorted_indices = np.argsort(self.eigenvalue)[::-1]
+        self.eigenvalue = self.eigenvalue[sorted_indices]
+        self.eigenvector = self.eigenvector[:, sorted_indices]
+        return self.eigenvalue, self.eigenvector
     def select_components(self):
-        self.total_variance = sum(self._eigenvalue)
-        self._explained_variance_ratio = self._eigenvalue / self.total_variance
-        self._cumuative_explained_variance = np.cumsum(self._explained_variance_ratio)
-        self._selected_components = self._eigenvector[:, : self.n_components]
+        self.total_variance = sum(self.eigenvalue)
+        self.explained_variance_ratio = self.eigenvalue / self.total_variance
+        self.cumuative_explained_variance = np.cumsum(self.explained_variance_ratio)
+        self._selected_components = self.eigenvector[:, : self.n_components]
         return self._selected_components
-    def transform(self, data, features = None):
+    def transform(self, features = None):
         if features == None:
-            features = data.select_dtypes(include=[np.number]).columns        
-        centered_data = data[features] - data[features].mean()
+            features = self.data.select_dtypes(include=[np.number]).columns        
+        centered_data = self.data[features] - self.data[features].mean()
         self.transformed_data = centered_data.dot(self._selected_components)
         return self.transformed_data
-    def fit_transform(self, data, features = None):
+    def fit_transform(self, features = None):
         if features == None:
-            features = data.columns
-        self.standardizing_data(data, features = None)
+            features = self.data.columns
+        self.standardizing_data(features = None)
         self.compute_covariance()
         self.compute_eigen()
         self.sort_eigen()
         self.select_components()
-        return self.transform(data, features = None)
+        return self.transform(features = None)
     
 #Making Train Test Split
 class train_test_split():
