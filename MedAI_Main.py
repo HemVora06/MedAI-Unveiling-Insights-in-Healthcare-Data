@@ -218,7 +218,12 @@ X_pca_sklearn = pca_sklearn.fit_transform(scaled_cancer_data)
 pca_scratch = func.PCA(n_components = 2, data = cancer_data)
 X_pca_scratch = pca_scratch.fit_transform(cancer_data)
 
+#Explained Variance Ratio
 print("Scikit Learn's Explained Variance Ratio: ", pca_sklearn.explained_variance_ratio_)
 print("Scratch's Explained Variance Ratio: ", pca_scratch.explained_variance_ratio)
+
+#Eigen Vectors
+print("Scikit Learn's Eigen Vectors: ", pca_sklearn.components_)
+print("Scratch's Eigen Vectors: ", pca_scratch.selected_components)
 
 #Data Cleaning and Data Preprocessing
