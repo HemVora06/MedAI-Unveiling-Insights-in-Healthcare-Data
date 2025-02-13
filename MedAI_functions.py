@@ -99,14 +99,20 @@ class PCA():
     
 #Making Train Test Split
 class train_test_split():
-    def __init__(self, test_size = 0.25, train_size = None, shuffle = True, random_state = None):
+    def __init__(self, test_size = 0.25, train_size = None, shuffle = True, random_state = None, stratified = False):
         self.test_size = test_size
         self.shuffle = shuffle
         self.random_state = random_state
         self.train_size = train_size
+        self._stratified = stratified
         self._n_samples = None
         self.data = None
         self.target = None
+        self.class_indices = None
+        self.test_malignant_indices = None
+        self.test_benign_indices = None
+        self.train_malignant_indices = None
+        self.train_benign_indices = None
 
     def data_validater(self, data, target):
         #Check if the length of data and target matches
@@ -129,46 +135,61 @@ class train_test_split():
         self.data_validater(data, target)
         self._n_samples = len(data)
         self.indices = np.arange(self._n_samples)
+        self.class_indices = {}
         if self.random_state is not None:
             np.random.seed(self.random_state)
-        if type(self.test_size) is float and self.train_size == None:
+        
+         # Default test size
+        if self.test_size is None and self.train_size is None:
+            self.test_size = 0.25
+            # Compute train and test sizes
+        if isinstance(self.test_size, float):
             self._n_test = int(self.test_size * self._n_samples)
-            self._n_train = self._n_samples - self._n_test
-        elif type(self.test_size) is int and self.train_size == None:
+        elif isinstance(self.test_size, int):
             self._n_test = self.test_size
-            self._n_train = self._n_samples - self._n_test
-        elif self.test_size == None and self.train_size == None:
-            self._n_test = int(self.test_size * self._n_samples)
-            self._n_train = self._n_samples - self._n_test
-        elif self.test_size == None and type(self.train_size) is float:
-            self._n_train = int(self.train_size * self._n_samples)
-            self._n_test = self._n_samples - self._n_train
-        elif self.test_size == None and type(self.train_size) is int:
-            self._n_train = self.train_size
-            self._n_test = self._n_samples - self._n_train
-        elif type(self.test_size) is float and type(self.train_size) is float:
-            self._n_test = int(self.test_size * self._n_samples)
-            self._n_train = int(self.train_size * self._n_samples)
-        elif type(self.test_size) is int and type(self.train_size) is int:
-            self._n_test = self.test_size
-            self._n_train = self.train_size
-        elif type(self.test_size) is int and type(self.train_size) is float:
-            self._n_train = int(self.train_size * self._n_samples)
-            self._n_test = self.test_size
-        elif type(self.test_size) is float and type(self.train_size) is int:
-            self._n_train = self.train_size
-            self._n_test = int(self.test_size * self._n_samples)
         else:
-            raise ValueError("HOW???")
+            self._n_test = 0
+
+        if self.train_size is None:
+            self._n_train = self._n_samples - self._n_test
+        elif isinstance(self.train_size, float):
+            self._n_train = int(self.train_size * self._n_samples)
+        elif isinstance(self.train_size, int):
+            self._n_train = self.train_size
+        else:
+            raise ValueError("Invalid value for train_size.")
         if self._n_test + self._n_train > self._n_samples:
             raise ValueError("Test size and train size cannot be larger than the total number of samples")
-        if self.shuffle == True:
-            self.shuffled_indices = np.random.permutation(self.indices)
-            self.test_indices = self.shuffled_indices[:self._n_test]
-            self.train_indices = self.shuffled_indices[self._n_test:]
-        else:
-            self.test_indices = self.indices[:self._n_test]
-            self.train_indices = self.indices[self._n_test:]
+        if self._stratified is False:
+            if self.shuffle == True:
+                self.shuffled_indices = np.random.permutation(self.indices)
+                self.test_indices = self.shuffled_indices[:self._n_test]
+                self.train_indices = self.shuffled_indices[self._n_test:]
+            else:
+                self.test_indices = self.indices[:self._n_test]
+                self.train_indices = self.indices[self._n_test:]
+        if self._stratified == True:
+            # Stratified split
+            self.shuffle = False
+            if self.shuffle is True:
+                raise ValueError("Not Expected and Allowed")
+            for c in np.unique(target):
+                self.class_indices[c] = np.where(target == c)[0]
+                self.shuffled_indices = np.random.permutation(self.class_indices[c])
+                self.test_indices = self.shuffled_indices[:self._n_test]
+                self.train_indices = self.shuffled_indices[self._n_test:]
+                if c == 1:
+                    self.test_malignant_indices = self.test_indices
+                    self.train_malignant_indices = self.train_indices
+                else:
+                    self.test_benign_indices = self.test_indices
+                    self.train_benign_indices = self.train_indices
+            self.test_indices = np.concatenate([self.test_benign_indices, self.test_malignant_indices])
+            self.train_indices = np.concatenate([self.train_benign_indices, self.train_malignant_indices])
+
+            
+
+
         self.X_train = data.iloc[self.train_indices]
         self.y_train = target.iloc[self.train_indices]
         self.X_test = data.iloc[self.test_indices]
