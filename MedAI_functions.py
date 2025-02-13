@@ -114,26 +114,26 @@ class train_test_split():
         self.train_malignant_indices = None
         self.train_benign_indices = None
 
-    def data_validater(self, data, target):
+    def data_validater(self, X, y):
         #Check if the length of data and target matches
-        if len(data) != len(target):
+        if len(X) != len(y):
             raise ValueError("Data and Target must have the same number of rows")
         #Check if the format of data is valid
-        if isinstance(data, pd.DataFrame):
-            self.data = data
-        elif isinstance(data, (list, np.ndarray)):
-            self.data = pd.DataFrame(data)
+        if isinstance(X, pd.DataFrame):
+            self.data = X
+        elif isinstance(X, (list, np.ndarray)):
+            self.data = pd.DataFrame(X)
         else:
             raise ValueError("Data must be either a Dataframe or a List or a Ndarray")
         #Check if the format of target is correct
-        if isinstance(target, (pd.Series, np.ndarray, list)):
-            self.target = pd.Series(target) if not isinstance(target, pd.Series) else target
+        if isinstance(y, (pd.Series, np.ndarray, list)):
+            self.target = pd.Series(y) if not isinstance(y, pd.Series) else y
         else:
             raise ValueError("Data must be either Series, Ndarray or List")
             
-    def split(self, data, target):
-        self.data_validater(data, target)
-        self._n_samples = len(data)
+    def split(self, X, y):
+        self.data_validater(X, y)
+        self._n_samples = len(X)
         self.indices = np.arange(self._n_samples)
         self.class_indices = {}
         if self.random_state is not None:
@@ -173,8 +173,8 @@ class train_test_split():
             self.shuffle = False
             if self.shuffle is True:
                 raise ValueError("Not Expected and Allowed")
-            for c in np.unique(target):
-                self.class_indices[c] = np.where(target == c)[0]
+            for c in np.unique(y):
+                self.class_indices[c] = np.where(y == c)[0]
                 self.shuffled_indices = np.random.permutation(self.class_indices[c])
                 self.test_indices = self.shuffled_indices[:self._n_test]
                 self.train_indices = self.shuffled_indices[self._n_test:]
@@ -186,12 +186,11 @@ class train_test_split():
                     self.train_benign_indices = self.train_indices
             self.test_indices = np.concatenate([self.test_benign_indices, self.test_malignant_indices])
             self.train_indices = np.concatenate([self.train_benign_indices, self.train_malignant_indices])
-
             
 
 
-        self.X_train = data.iloc[self.train_indices]
-        self.y_train = target.iloc[self.train_indices]
-        self.X_test = data.iloc[self.test_indices]
-        self.y_test = target.iloc[self.test_indices]
+        self.X_train = X.iloc[self.train_indices]
+        self.y_train = y.iloc[self.train_indices]
+        self.X_test = X.iloc[self.test_indices]
+        self.y_test = y.iloc[self.test_indices]
         return self.X_train, self.X_test, self.y_train, self.y_test
