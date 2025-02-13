@@ -227,3 +227,13 @@ print("Scikit Learn's Eigen Vectors: ", pca_sklearn.components_)
 print("Scratch's Eigen Vectors: ", pca_scratch.selected_components)
 
 #Data Cleaning and Data Preprocessing
+
+data = cancer_data.drop(['diagnosis', 'id'], axis = 1)
+target = cancer_data['diagnosis']
+
+#Splitting Train Test Data
+splitter = func.train_test_split(test_size = 0.20, random_state = 42, stratified = True)
+X_train, X_test, y_train, y_test = splitter.split(X = data, y = target)
+print(X_train, X_test, y_train, y_test)
+print(np.unique(y_train, return_counts = True))
+print(np.unique(y_test, return_counts = True))
