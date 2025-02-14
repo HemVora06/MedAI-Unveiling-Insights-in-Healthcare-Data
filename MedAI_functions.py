@@ -144,7 +144,7 @@ class train_test_split():
             self.test_size = 0.25
             # Compute train and test sizes
         if isinstance(self.test_size, float):
-            self._n_test = int(self.test_size * self._n_samples)
+            self._n_test = np.floor(self.test_size * self._n_samples)
         elif isinstance(self.test_size, int):
             self._n_test = self.test_size
         else:
@@ -153,13 +153,14 @@ class train_test_split():
         if self.train_size is None:
             self._n_train = self._n_samples - self._n_test
         elif isinstance(self.train_size, float):
-            self._n_train = int(self.train_size * self._n_samples)
+            self._n_train = np.floor(self.train_size * self._n_samples)
         elif isinstance(self.train_size, int):
             self._n_train = self.train_size
         else:
             raise ValueError("Invalid value for train_size.")
         if self._n_test + self._n_train > self._n_samples:
             raise ValueError("Test size and train size cannot be larger than the total number of samples")
+        # Normal Random Split
         if self._stratified is False:
             if self.shuffle == True:
                 self.shuffled_indices = np.random.permutation(self.indices)
@@ -168,8 +169,8 @@ class train_test_split():
             else:
                 self.test_indices = self.indices[:self._n_test]
                 self.train_indices = self.indices[self._n_test:]
+        # Stratified split
         if self._stratified == True:
-            # Stratified split
             self.shuffle = False
             if self.shuffle is True:
                 raise ValueError("Not Expected and Allowed")
