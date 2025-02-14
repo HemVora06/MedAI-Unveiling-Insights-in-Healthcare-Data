@@ -172,13 +172,14 @@ class train_test_split():
         # Stratified split
         if self._stratified == True:
             self.shuffle = False
-            if self.shuffle is True:
-                raise ValueError("Not Expected and Allowed")
+            train_indices_list = []
+            test_indices_list = []
             for c in np.unique(y):
                 self.class_indices[c] = np.where(y == c)[0]
                 self.shuffled_indices = np.random.permutation(self.class_indices[c])
-                self.test_indices = self.shuffled_indices[:self._n_test]
-                self.train_indices = self.shuffled_indices[self._n_test:]
+                n_test_c = int(np.floor(self.test_size * len(self.class_indices[c])))
+                self.test_indices = self.shuffled_indices[:n_test_c]
+                self.train_indices = self.shuffled_indices[n_test_c:]
                 if c == 1:
                     self.test_malignant_indices = self.test_indices
                     self.train_malignant_indices = self.train_indices
