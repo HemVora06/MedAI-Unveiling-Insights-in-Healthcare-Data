@@ -246,3 +246,28 @@ X_train_sk, X_test_sk, y_train_sk, y_test_sk = train_test_split(
 print(X_train_sk, X_test_sk, y_train_sk, y_test_sk)
 print(np.unique(y_train_sk, return_counts = True))
 print(np.unique(y_test_sk, return_counts = True))
+
+X_train = pd.DataFrame(X_train)
+X_test = pd.DataFrame(X_test)
+
+#Finding Outliers
+X_train['radius_mean_zscore'] = stats.zscore(X_train['radius_mean'])
+X_test['radius_mean_zscore'] = stats.zscore(X_test['radius_mean'])
+print(X_train.loc[X_train['radius_mean_zscore'] >= 2, 'radius_mean'])
+print(X_test.loc[X_test['radius_mean_zscore'] >= 2, 'radius_mean'])
+
+def z_score_outlier_solver(data = pd.DataFrame, threshold = int, features = None):
+    if features is None:
+        features = data.columns
+    z_score_counter = {}
+    for f in features:
+        data[f] = pd.to_numeric(data[f], errors = 'coerce')
+        z_score_counter[f] = stats.zscore(data[f])
+        outliers = data.loc[z_score_counter[f].abs() >= threshold, f]
+        outliers = pd.DataFrame(outliers)
+        max_valid_value = data[f].max()
+        data[f] = np.where(z_score_counter[f] >= threshold, max_valid_value, data[f])
+    return data
+    
+X_train = z_score_outlier_solver(X_train, threshold = 2)
+X_test = z_score_outlier_solver(X_test, threshold = 2)
