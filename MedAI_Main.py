@@ -237,3 +237,12 @@ X_train, X_test, y_train, y_test = splitter.split(X = data, y = target)
 print(X_train, X_test, y_train, y_test)
 print(np.unique(y_train, return_counts = True))
 print(np.unique(y_test, return_counts = True))
+
+#Comparing the splitted data
+from sklearn.model_selection import train_test_split
+X_train_sk, X_test_sk, y_train_sk, y_test_sk = train_test_split(
+    data, target, test_size=0.20, random_state=42, stratify=target
+)
+print(X_train_sk, X_test_sk, y_train_sk, y_test_sk)
+print(np.unique(y_train_sk, return_counts = True))
+print(np.unique(y_test_sk, return_counts = True))
